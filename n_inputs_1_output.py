@@ -1,19 +1,32 @@
 import numpy as np
+from random import randint
+from Neural_network import NeuralNetwork2, correct_output
 
 # Define the model parameters
-from Neural_network import NeuralNetwork2
+number_of_neurons = 3
+number_of_input_data = 4
+weights = np.array([randint(0, 10) / 10 for _ in range(number_of_neurons)])
+print(weights)
 
-weights = [0.5, 0.3]  # Two weights for two inputs
 bias = 0.2
 learning_rate = 0.01
-epochs = 8
+epochs = 25
 
-# Training data (two inputs for each data point)
-input_data = np.array([[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [4.0, 5.0]])
-desired_output = np.array([num[0] * 3 + num[1] * 2 + 3 for num in input_data])  # 3x1 + 2x2 + 3
+input_data = np.array([[randint(1, 100) / 100 for _ in range(number_of_neurons)] for __ in range(number_of_input_data)])
+print(f"Input data: {input_data}")
 
-test_input = np.array([5.0, 6.0])  # Two inputs for testing
-test_prediction = np.array(test_input[0] * 3 + test_input[1] * 2 + 3)
+multipliers = [randint(1, 10) / 10 for _ in range(number_of_neurons)]
+print(f"Multipliers data: {multipliers}")
+constant = randint(1, 5)
+print(f"constant data: {constant}")
+
+desired_output = correct_output(input_data, multipliers, constant)
+
+test_input = np.array([[randint(1, 100) / 100 for _ in range(number_of_neurons)]])
+print(f"test_input data: {test_input}")
+
+test_prediction = correct_output(test_input, multipliers, constant)
+print(f"test_prediction data: {test_prediction}")
 
 # Create and train the neural network
 nn = NeuralNetwork2(weights, bias, learning_rate)

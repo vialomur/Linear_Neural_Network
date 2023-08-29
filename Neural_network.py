@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class NeuralNetwork:
@@ -67,7 +68,7 @@ class NeuralNetwork2:
         self.learning_rate = learning_rate
 
     def predict(self, input_data):
-        return sum(input_data * self.weights) + self.bias
+        return sum(input_data[0] * self.weights) + self.bias
 
     def train(self, input_data, desired_output, epochs, test_input, test_prediction, verbose=0):
         epoch_list = []
@@ -99,3 +100,15 @@ class NeuralNetwork2:
 
         final_prediction = self.predict(test_input)
         print("Final Prediction:", final_prediction)
+
+
+def correct_output(input_data, multipliers, constant):
+    desired_outputs = []
+    for i in range(len(input_data)):
+        desired_output = 0
+        for j in range(len(input_data[0])):
+            desired_output += input_data[i][j] * multipliers[j]
+        desired_output += constant
+        desired_outputs.append(desired_output)
+
+    return np.array(desired_outputs)
