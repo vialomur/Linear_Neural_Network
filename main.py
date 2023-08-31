@@ -1,6 +1,7 @@
 import matplotlib
 import numpy as np
-from Neural_network import NeuralNetwork, NeuralNetwork2
+
+from Neural_Network_1in_1out import NeuralNetwork
 
 matplotlib.get_backend()
 matplotlib.use('QtAgg')

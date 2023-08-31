@@ -1,64 +1,21 @@
-import matplotlib.pyplot as plt
+import random
+
 import numpy as np
 
 
-class NeuralNetwork:
-    def __init__(self, weight, bias, learning_rate):
-        self.weight = weight
-        self.bias = bias
-        self.learning_rate = learning_rate
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.weight = random.randint(1, 10) / 10
 
-    def predict(self, input_data):
-        return input_data * self.weight + self.bias
 
-    def train(self, input_data, desired_output, epochs, test_input, test_prediction, verbose=0):
-        epoch_list = []
-        error_list = []
-        bias_list = []
-        weight_list = []
+class InputLayer:
+    def __init__(self, values):
+        self.nodes = []
+        for value in values:
+            self.nodes.append(Node(value))
 
-        for epoch in range(epochs):
-            epoch_list.append(epoch)
-
-            if verbose:
-                print(f"Epoch: {epoch}, prediction: {self.predict(test_input)}")
-
-            prediction = 0
-            for i in range(len(input_data)):
-                prediction = self.predict(input_data[i])
-
-                error = desired_output[i] - prediction
-
-                self.weight += self.learning_rate * error * input_data[i]
-                self.bias += self.learning_rate * error
-
-            total_error = abs(test_prediction - prediction)
-            error_list.append(total_error)
-            bias_list.append(self.bias)
-            weight_list.append(self.weight)
-
-        final_prediction = self.predict(test_input)
-        print("Final Prediction:", final_prediction)
-
-    def plot_learning_process(self, epochs, error_list, bias_list, weight_list):
-        plt.figure(figsize=(10, 5))
-
-        plt.subplot(2, 1, 1)
-        plt.plot(epochs, error_list, marker='o')
-        plt.title('Error vs. Epoch')
-        plt.xlabel('Epoch')
-        plt.ylabel('Error')
-
-        plt.subplot(2, 1, 2)
-        plt.plot(epochs, bias_list, label='Bias', marker='o')
-        plt.plot(epochs, weight_list, label='Weight', marker='o')
-        plt.title('Bias and Weight vs. Epoch')
-        plt.xlabel('Epoch')
-        plt.ylabel('Value')
-        plt.legend()
-
-        plt.tight_layout()
-        plt.show()
+        self.nodes = np.array(self.nodes)
 
 
 class NeuralNetwork2:
@@ -90,11 +47,9 @@ class NeuralNetwork2:
             if verbose == 1:
                 print(f"Epoch: {epoch}, prediction: {self.predict(test_input)}")
 
-            if verbose == 2:
-                if epoch % 10 == 0:
-                    print(f"Epoch: {epoch}, prediction: {self.predict(test_input)}")
+            if verbose == 2 and (epoch % 10 == 0):
+                print(f"Epoch: {epoch}, prediction: {self.predict(test_input)}")
 
-            prediction = 0
             for i in range(len(input_data)):
                 if self.stop:
                     break
@@ -108,23 +63,20 @@ class NeuralNetwork2:
 
                 self.bias += self.learning_rate * error
 
-            #total_error = abs(test_prediction - prediction) TODO fix error appending
-            #error_list.append(total_error)
+            # total_error = abs(test_prediction - prediction) TODO fix error appending
+            # error_list.append(total_error)
             bias_list.append(self.bias)
             weight_list.append(self.weights[:])  # Store a copy of the weights
             self.stop_test(test_prediction, self.predict(test_input), error_percentage)
 
         final_prediction = self.predict(test_input)
-        print("Final Prediction:", final_prediction)
+        print(f"Final Prediction: {final_prediction} vs {test_prediction[0]}")
 
 
 def correct_output(input_data, multipliers, constant):
     desired_outputs = []
     for i in range(len(input_data)):
-        desired_output = 0
-        for j in range(len(input_data[0])):
-            desired_output += input_data[i][j] * multipliers[j]
-        desired_output += constant
+        desired_output = np.dot(input_data[i], multipliers) + constant
         desired_outputs.append(desired_output)
 
     return np.array(desired_outputs)
