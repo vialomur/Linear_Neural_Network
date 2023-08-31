@@ -65,20 +65,25 @@ def correct_output(input_data, multipliers, constant):
 
 
 
-# TODO  optimize learning process
+# TODO  I've undesrtand that I want to make smth unreal
 # Example usage
 number_of_learn_data = 15
 number_of_inputs = 2
 number_of_outputs = 1
 input_data = np.array([[random.randint(0, 10) / 10 for __ in range(number_of_inputs)] for _ in range(number_of_learn_data)])
 print(f"Learn data:{input_data}")
-desired_outputs = np.array(
-    [[random.randint(0, 100) / 100 for _ in range(number_of_outputs)] for _ in range(number_of_learn_data)])
+
+multipliers = [random.randint(1, 10) / 10 for _ in range(number_of_inputs)]
+print(f"Multipliers: {multipliers}")
+constant = random.randint(0, 3)
+print(f"Constant: {constant}")
+
+desired_outputs = correct_output(input_data, multipliers, constant)
 
 print(f"Desired outputs:{desired_outputs}")
 
-test_input = np.array([random.randint(0, 10) / 10 for _ in range(number_of_inputs)])
-test_prediction = np.array([random.randint(0, 100) / 100 for _ in range(number_of_outputs)])
+test_input = np.array([[random.randint(0, 10) / 10 for _ in range(number_of_inputs)]])
+test_prediction = correct_output(test_input, multipliers, constant)
 
 initial_weights = np.random.rand(input_data.shape[1], desired_outputs.shape[1])
 initial_biases = np.random.rand(desired_outputs.shape[1])
