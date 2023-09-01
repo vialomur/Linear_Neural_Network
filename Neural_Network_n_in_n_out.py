@@ -3,9 +3,33 @@ import random
 import numpy as np
 
 
-class NeuralNetwork_n_n:
-    def __init__(self, weights, biases, learning_rate):
-        self.weights = weights
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.weight = random.randint(1, 10) / 10
+
+
+class InputLayer:
+    def __init__(self, values):
+        self.nodes = []
+        for value in values:
+            self.nodes.append(Node(value))
+
+        self.nodes = np.array(self.nodes)
+
+
+class HiddenLayer:
+    def __init__(self, size):
+        self.nodes = []
+        for _ in range(size):
+            self.nodes.append(Node(0))
+
+        self.nodes = np.array(self.nodes)
+
+
+class NeuralNetwork_hidden:
+    def __init__(self, inputs, biases, learning_rate):
+        self.inputs = inputs
         self.biases = biases
         self.learning_rate = learning_rate
         self.stop = False

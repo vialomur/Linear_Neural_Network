@@ -1,21 +1,4 @@
-import random
-
 import numpy as np
-
-
-class Node:
-    def __init__(self, value):
-        self.value = value
-        self.weight = random.randint(1, 10) / 10
-
-
-class InputLayer:
-    def __init__(self, values):
-        self.nodes = []
-        for value in values:
-            self.nodes.append(Node(value))
-
-        self.nodes = np.array(self.nodes)
 
 
 class NeuralNetwork2:
@@ -29,7 +12,8 @@ class NeuralNetwork2:
         return sum(input_data[0] * self.weights) + self.bias
 
     def stop_test(self, correct_output, prediction, error_percentage):
-        if (((abs(correct_output - prediction)) / correct_output) * 100) < error_percentage:
+        epsilon = 1e-9
+        if np.all((((abs(correct_output - prediction)) / (correct_output+epsilon)) * 100) < error_percentage):
             self.stop = True
 
     def train(self, input_data, desired_output, epochs, test_input, test_prediction, verbose=0, error_percentage=5):
