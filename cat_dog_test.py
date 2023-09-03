@@ -13,7 +13,7 @@ weights = np.array([randint(0, 10) / 10 for _ in range(number_of_neurons)])
 print(weights)
 
 bias = 0.2
-learning_rate = 0.0001
+learning_rate = 0.001
 epochs = 500
 
 input_data = np.array([cat_array, dog_array])
