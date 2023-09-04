@@ -1,12 +1,15 @@
 import multiprocessing
+import random
 
 import numpy as np
 
 
-class NeuralNetwork2:
-    def __init__(self, weights, bias, learning_rate):
+class NeuralNetwork3:
+    def __init__(self, weights, hidden_weights, bias, learning_rate):
         self.weights = weights
+        self.hidden_weights = hidden_weights
         self.bias = bias
+        self.bias_hidden = random.randint(0, 100) / 100
         self.learning_rate = learning_rate
         self.stop = False
         # Adam optimizer parameters
@@ -19,8 +22,11 @@ class NeuralNetwork2:
         self.v_bias = 0
         self.t = 0  # Time step
 
-    def predict(self, input_data):
-        return np.dot(input_data, self.weights) + self.bias
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def predict(self, input_data, weights, bias):
+        return np.dot(input_data, weights) + bias
 
     def stop_test(self, correct_output, prediction, error_percentage):
         epsilon = 1e-9
@@ -43,32 +49,37 @@ class NeuralNetwork2:
         self.weights[j] += self.learning_rate * m_hat / (np.sqrt(v_hat) + self.epsilon)
 
     def train_one_input_data(self, input_data, desired_output):
-        n_proc = 8
-        prediction = self.predict(input_data)
+        hidden_output = np.dot(input_data, self.hidden_weights) + self.bias_hidden
+        hidden_output = self.sigmoid(hidden_output)  # Apply activation function
+
+        prediction = np.dot(hidden_output, self.weights) + self.bias
+        error = desired_output - prediction
+
+        # Backpropagation and weight updates for the output layer
+        delta_output = -error
+        d_weights = np.outer(hidden_output, delta_output)
+        d_bias = delta_output
+
+        # Backpropagation and weight updates for the hidden layer
+        delta_hidden = np.dot(delta_output, self.weights.T) * hidden_output * (1 - hidden_output)
+        d_hidden_weights = np.outer(input_data, delta_hidden)
+        d_bias_hidden = delta_hidden
+
+        # Update weights and biases
+        self.weights -= self.learning_rate * d_weights
+        self.bias -= self.learning_rate * d_bias
+        self.hidden_weights -= self.learning_rate * d_hidden_weights
+        self.bias_hidden -= self.learning_rate * d_bias_hidden
+        prediction = self.predict(input_data, self.hidden_weights,self.bias_hidden)  # output prediction
 
         error = desired_output - prediction
 
         self.t += 1  # Increment the time step
 
-        #processes = []
         j = 0
         while j < len(self.weights):
-
-            # for proc in range(n_proc):
-            #     if j >= len(self.weights):
-            #         break
-
-            #     p = multiprocessing.Process(target=self.update_one_weight, args=(input_data, error, j,))
-            #     processes.append(p)
-            #     p.start()
-            #     j += 1
-            #
-            # for process in processes:
-            #     process.join()
             self.update_one_weight(input_data, error, j)
             j += 1
-
-
 
     def train(self, input_data, desired_output, epochs, test_input, test_prediction, verbose=0, error_percentage=5):
         for epoch in range(epochs):
@@ -76,11 +87,10 @@ class NeuralNetwork2:
                 break
 
             if verbose == 1:
-                print(f"Epoch: {epoch}, prediction: {self.predict(test_input)}")
+                print(f"Epoch: {epoch}, prediction: {self.predict(test_input, self.hidden_weights, self.bias_hidden)}")
 
             if verbose == 2 and (epoch % 10 == 0):
-                print(f"Epoch: {epoch}, prediction: {self.predict(test_input)}")
-
+                print(f"Epoch: {epoch}, prediction: {self.predict(test_input, self.hidden_weights, self.bias_hidden)}")
 
             for i in range(len(input_data)):
                 if self.stop:
@@ -88,9 +98,9 @@ class NeuralNetwork2:
 
                 self.train_one_input_data(input_data[i], desired_output[i])
 
-            self.stop_test(test_prediction, self.predict(test_input), error_percentage)
+            self.stop_test(test_prediction, self.predict(test_input, self.hidden_weights, self.bias_hidden), error_percentage)
 
-        final_prediction = self.predict(test_input)
+        final_prediction = self.predict(test_input, self.hidden_weights, self.bias_hidden)
         print(f"Final Prediction: {final_prediction} vs {test_prediction[0]}")
 
 
